@@ -1,0 +1,16 @@
+PODS:
+  - PagingFlowView (0.1.0)
+
+DEPENDENCIES:
+  - PagingFlowView (from `../`)
+
+EXTERNAL SOURCES:
+  PagingFlowView:
+    :path: ../
+
+SPEC CHECKSUMS:
+  PagingFlowView: 377a248fd8b2e3754fcfa85a50bacb9727bb56d1
+
+PODFILE CHECKSUM: cbf6d98600c4d3aa6f233311cebf8bf6a5d8258f
+
+COCOAPODS: 1.2.1

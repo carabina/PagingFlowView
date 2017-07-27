@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'PagingFlowView_Example' do
+  pod 'PagingFlowView', :path => '../'
+
+  target 'PagingFlowView_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end

@@ -9,7 +9,7 @@
 import UIKit
 import PagingFlowView
 
-class ViewController: UIViewController, UICollectionViewDataSource {
+class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     
     var collectionView: UICollectionView!
     
@@ -22,11 +22,12 @@ class ViewController: UIViewController, UICollectionViewDataSource {
         pagingFlowLayout.minimumInteritemSpacing = 5
         pagingFlowLayout.scrollDirection = .horizontal
         
-        collectionView = UICollectionView(frame: CGRect(origin: .zero, size: CGSize(width: view.bounds.width, height: view.bounds.height)), collectionViewLayout: pagingFlowLayout)
+        collectionView = UICollectionView(frame: CGRect(origin: .zero, size: CGSize(width: view.bounds.width, height: 210)), collectionViewLayout: pagingFlowLayout)
         collectionView.center = view.center
         collectionView.dataSource = self
-        collectionView.contentInset = UIEdgeInsets(top: 0, left: (view.bounds.width) / 2, bottom: 0, right: (view.bounds.width) / 2)
-        collectionView.contentInset = UIEdgeInsets(top: 0, left: (view.bounds.width - pagingFlowLayout.itemSize.width) / 2, bottom: 0, right: (view.bounds.width - pagingFlowLayout.itemSize.width) / 2)
+        collectionView.delegate = self
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+        // collectionView.contentInset = UIEdgeInsets(top: 0, left: (view.bounds.width - pagingFlowLayout.itemSize.width) / 2, bottom: 0, right: (view.bounds.width - pagingFlowLayout.itemSize.width) / 2)
         collectionView.register(PagingFlowCell.self, forCellWithReuseIdentifier: "PagingFlowCell")
         collectionView.backgroundColor = UIColor(red: 250.0 / 255, green: 250.0 / 255, blue: 250.0 / 255, alpha: 1.0)
         view.addSubview(collectionView)
@@ -37,13 +38,20 @@ class ViewController: UIViewController, UICollectionViewDataSource {
         // Dispose of any resources that can be recreated.
     }
     
+    private var numberOfItems = 10
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return numberOfItems
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PagingFlowCell", for: indexPath)
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        numberOfItems -= 1
+        collectionView.deleteItems(at: [indexPath])
     }
 }
 

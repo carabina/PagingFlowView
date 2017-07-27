@@ -42,7 +42,22 @@ open class PagingFlowLayout: UICollectionViewFlowLayout {
     }
     
     open override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
-        let targetContentOffset = super.targetContentOffset(forProposedContentOffset: proposedContentOffset)
+        var targetContentOffset = super.targetContentOffset(forProposedContentOffset: proposedContentOffset)
+        let targetPage = self.targetPage(forContentOffset: targetContentOffset)
+
+        switch scrollDirection {
+        case .horizontal:
+            targetContentOffset.x = self.targetContentOffset(forPage: targetPage).x
+        case .vertical:
+            targetContentOffset.y = self.targetContentOffset(forPage: targetPage).y
+        }
+        
+        defer {
+            NSLog("page: \(page) -> \(targetPage)")
+            
+            page = targetPage
+        }
+        
         return targetContentOffset
     }
     

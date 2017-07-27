@@ -6,10 +6,10 @@ DEPENDENCIES:
 
 EXTERNAL SOURCES:
   PagingFlowView:
-    :path: ../
+    :path: "../"
 
 SPEC CHECKSUMS:
-  PagingFlowView: 377a248fd8b2e3754fcfa85a50bacb9727bb56d1
+  PagingFlowView: af673afc00543cf19e065d69e183106ad9905733
 
 PODFILE CHECKSUM: cbf6d98600c4d3aa6f233311cebf8bf6a5d8258f
 

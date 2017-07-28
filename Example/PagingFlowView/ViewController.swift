@@ -16,7 +16,10 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let pagingFlowLayout = PagingFlowLayout(pageLength: 145)
+        let pagingFlowLayout = PagingFlowLayout()
+        pagingFlowLayout.pageRange = 145
+        pagingFlowLayout.maximumSkippingPages = 3
+        pagingFlowLayout.initiateCompensativeAnimationOnEndDraggingPage = false
         pagingFlowLayout.itemSize = CGSize(width: 140, height: 210)
         pagingFlowLayout.minimumLineSpacing = 5
         pagingFlowLayout.minimumInteritemSpacing = 5
@@ -27,10 +30,13 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-        // collectionView.contentInset = UIEdgeInsets(top: 0, left: (view.bounds.width - pagingFlowLayout.itemSize.width) / 2, bottom: 0, right: (view.bounds.width - pagingFlowLayout.itemSize.width) / 2)
+//        collectionView.contentInset = UIEdgeInsets(top: 0, left: (view.bounds.width) / 2 * 3, bottom: 0, right: (view.bounds.width) / 2 * 3)
+//        collectionView.contentInset = UIEdgeInsets(top: 0, left: (view.bounds.width - pagingFlowLayout.itemSize.width) / 2, bottom: 0, right: (view.bounds.width - pagingFlowLayout.itemSize.width) / 2)
         collectionView.register(PagingFlowCell.self, forCellWithReuseIdentifier: "PagingFlowCell")
         collectionView.backgroundColor = UIColor(red: 250.0 / 255, green: 250.0 / 255, blue: 250.0 / 255, alpha: 1.0)
         view.addSubview(collectionView)
+        
+        pagingFlowLayout.pagingAlignOffset = CGPoint(x: -collectionView.contentInset.left, y: 0)
     }
 
     override func didReceiveMemoryWarning() {

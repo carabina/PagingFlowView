@@ -10,73 +10,47 @@ import Foundation
 
 open class PagingFlowLayout: UICollectionViewFlowLayout {
     
-    open var minSkippingPages: Int = 1 {
+    public var minimumSkippingPages: Int = 1 {
         willSet {
             precondition(newValue >= 1)
-            precondition(newValue <= maxSkippingPages)
+            precondition(newValue <= maximumSkippingPages)
         }
     }
     
-    open var maxSkippingPages: Int = 1 {
+    public var maximumSkippingPages: Int = 1 {
         willSet {
-            precondition(newValue >= minSkippingPages)
+            precondition(newValue >= minimumSkippingPages)
         }
     }
     
-    open var pageLength: CGFloat
+    open var pageRange: CGFloat = 0
+    open var pagingAlignOffset: CGPoint = .zero
     
-    private var page = 0
+    /// A flag to indicate whether should fire a compensative animation for end paging
+    /// because that default behaviour of custom target content offset for UIScrollView is undefine,
+    /// for example, sometimes ending animation scrolls smoothly slow.
+    ///
+    /// - Note: This is a violation operating on UICollectionView object for UICollectionViewLayout which just provides layout information to UICollectionView.
+    open var initiateCompensativeAnimationOnEndDraggingPage = true
     
-    public init(pageLength: CGFloat) {
-        self.pageLength = pageLength
-        
-        super.init()
-    }
-    
-    public required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    public override init() {
-        fatalError("init() has not been implemented")
-    }
-    
-    open override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
-        var targetContentOffset = super.targetContentOffset(forProposedContentOffset: proposedContentOffset)
-        let targetPage = self.targetPage(forContentOffset: targetContentOffset)
-
-        switch scrollDirection {
-        case .horizontal:
-            targetContentOffset.x = self.targetContentOffset(forPage: targetPage).x
-        case .vertical:
-            targetContentOffset.y = self.targetContentOffset(forPage: targetPage).y
-        }
-        
-        defer {
-            NSLog("page: \(page) -> \(targetPage)")
-            
-            page = targetPage
-        }
-        
-        return targetContentOffset
-    }
+    // MARK: Override
     
     open override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
         var targetContentOffset = super.targetContentOffset(forProposedContentOffset: proposedContentOffset, withScrollingVelocity: velocity)
-        let targetPage = self.targetPage(forContentOffset: targetContentOffset)
+        let targetPage = self.targetPage(forProposedContentOffset: targetContentOffset, withScrollingVelocity: velocity)
         
         switch scrollDirection {
         case .horizontal:
-            targetContentOffset.x = self.targetContentOffset(forPage: targetPage).x
+            targetContentOffset.x = self.expectingContentOffset(forPage: targetPage).x
         case .vertical:
-            targetContentOffset.y = self.targetContentOffset(forPage: targetPage).y
+            targetContentOffset.y = self.expectingContentOffset(forPage: targetPage).y
         }
         
         defer {
-            NSLog("page: \(page) -> \(targetPage), velocity: \(velocity)")
-            
-            collectionView.flatMap { collectionView in
-                UIView.animate(withDuration: 0.4 * fabs(Double(max(targetPage - page, 1))),
+            if initiateCompensativeAnimationOnEndDraggingPage, let collectionView = collectionView {
+                let presentPage = approximatePage(forContentOffset: collectionViewPresentContentOffset)
+                
+                UIView.animate(withDuration: 0.4 * fabs(Double(max(targetPage - presentPage, 1))),
                                delay: 0,
                                usingSpringWithDamping: collectionView.decelerationRate,
                                initialSpringVelocity: fabs(velocity.x) * 0.75,
@@ -85,60 +59,104 @@ open class PagingFlowLayout: UICollectionViewFlowLayout {
                                 collectionView.contentOffset = targetContentOffset
                 })
             }
-            
-            page = targetPage
         }
         
         return targetContentOffset
     }
     
-    private func targetContentOffset(forPage page: Int) -> CGPoint {
-        var targetContentOffset = CGPoint.zero
-        
-        switch scrollDirection {
-        case .horizontal:
-            targetContentOffset.x = CGFloat(page) * pageLength - (collectionView?.contentInset.left ?? 0)
-        case .vertical:
-            targetContentOffset.y = CGFloat(page) * pageLength - (collectionView?.contentInset.top ?? 0)
-        }
-        
-        return CGPoint(x: min(maxContentOffset.x, targetContentOffset.x), y: min(maxContentOffset.y, targetContentOffset.y))
-    }
+    // MARK: Collection View Interior Infomation
     
-    private var maxContentOffset: CGPoint {
-        guard let collectionView = collectionView else {
-            return .zero
-        }
-        
-        return CGPoint(x: collectionViewContentSize.width - collectionView.bounds.width + collectionViewContentInset.right, y: collectionViewContentSize.height - collectionView.bounds.height + collectionViewContentInset.bottom)
-    }
-    
-    private var collectionViewContentInset: UIEdgeInsets {
+    public var collectionViewContentInset: UIEdgeInsets {
         guard let collectionView = collectionView else {
             return .zero
         }
         return collectionView.contentInset
     }
     
-    private func targetPage(forContentOffset contentOffset: CGPoint) -> Int {
-        var approxPage: CGFloat = 0
+    public var minimumCollectionViewContentOffset: CGPoint {
+        return CGPoint(x: -collectionViewContentInset.left, y: -collectionViewContentInset.bottom)
+    }
+    
+    public var maximumCollectionViewContentOffset: CGPoint {
+        guard let collectionView = collectionView else {
+            return .zero
+        }
+        
+        return CGPoint(x: collectionViewContentSize.width - collectionView.bounds.width + collectionViewContentInset.right,
+                       y: collectionViewContentSize.height - collectionView.bounds.height + collectionViewContentInset.bottom)
+    }
+    
+    public var collectionViewPresentContentOffset: CGPoint {
+        guard let collectionView = collectionView else {
+            return .zero
+        }
+        return collectionView.contentOffset
+    }
+    
+    // MARK: Paging Utility
+    
+    public func expectingContentOffset(forPage page: Int) -> CGPoint {
+        var contentOffset = CGPoint.zero
         
         switch scrollDirection {
         case .horizontal:
-            approxPage = (contentOffset.x + collectionViewContentInset.left) / pageLength
-            approxPage = contentOffset.x >= maxContentOffset.x ? ceil(approxPage) : round(approxPage)
+            contentOffset.x = CGFloat(page) * pageRange + pagingAlignOffset.x
         case .vertical:
-            approxPage = (contentOffset.y + collectionViewContentInset.top) / pageLength
-            approxPage = contentOffset.y >= maxContentOffset.y ? ceil(approxPage) : round(approxPage)
+            contentOffset.y = CGFloat(page) * pageRange + pagingAlignOffset.y
         }
         
-        var targetPage = Int(approxPage)
-        
-        if targetPage != page {
-            let skippingPages = abs(targetPage - page)
-            targetPage = page + ((targetPage - page) > 0 ? 1 : -1) * max(min(skippingPages, maxSkippingPages), minSkippingPages)
-        }
-        
-        return targetPage
+        return CGPoint(x: max(min(maximumCollectionViewContentOffset.x, contentOffset.x), minimumCollectionViewContentOffset.x),
+                       y: max(min(maximumCollectionViewContentOffset.y, contentOffset.y), minimumCollectionViewContentOffset.y))
     }
+    
+    public func approximatePage(forContentOffset contentOffset: CGPoint) -> Int {
+        var approximatePage: CGFloat = 0
+        
+        switch scrollDirection {
+        case .horizontal:
+            approximatePage = (contentOffset.x - pagingAlignOffset.x) / pageRange
+            approximatePage = floor(approximatePage)
+        case .vertical:
+            approximatePage = (contentOffset.y - pagingAlignOffset.y) / pageRange
+            approximatePage = floor(approximatePage)
+        }
+        
+        return Int(approximatePage)
+    }
+    
+    private func targetPage(forProposedContentOffset proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> Int {
+        let proposedPage = approximatePage(forContentOffset: proposedContentOffset)
+        let presentPage = approximatePage(forContentOffset: collectionViewPresentContentOffset)
+        var targetPage = presentPage
+        
+        // Positive means increment, negative otherwise indicates decrement.
+        let forwardDirection = scrollDirection == .horizontal ? sign(velocity.x) : sign(velocity.y)
+        
+        // For the case of zero velocity, target page need more consideration that forwarding direction can't be directed by sign of velocity.
+        // The proposed content offset is equal to present content offset for collection view due to zero velocity.
+        // The proposed content could compensate for zero velocity by plus additional half minimumSkippingPages holding range. Luckily, it works for both direction.
+        
+        switch scrollDirection {
+        case .horizontal:
+            if velocity.x == 0 {
+                targetPage = approximatePage(forContentOffset: CGPoint(x: proposedContentOffset.x + CGFloat(minimumSkippingPages) * pageRange / 2, y: proposedContentOffset.y))
+            } else {
+                targetPage += max(minimumSkippingPages, min(maximumSkippingPages, abs(proposedPage - presentPage))) * forwardDirection
+            }
+        case .vertical:
+            if velocity.y == 0 {
+                targetPage = approximatePage(forContentOffset: CGPoint(x: proposedContentOffset.x, y: proposedContentOffset.y + CGFloat(minimumSkippingPages) * pageRange / 2))
+            } else {
+                targetPage += max(minimumSkippingPages, min(maximumSkippingPages, abs(proposedPage - presentPage))) * forwardDirection
+            }
+        }
+        
+        let compensates = forwardDirection < 0 ? 1 : 0
+        
+        return targetPage + compensates
+    }
+}
+
+private func sign<T>(_ n: T) -> Int where T: SignedNumber {
+    return n == 0 ? 0 : (n > 0 ? 1 : -1)
 }

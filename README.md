@@ -7,7 +7,7 @@
 
 ## Demo
 
-[![Demo Out-of-Box PagingFlowLayout](./PagingFlowViewDemo.gif)]
+![Demo Out-of-Box PagingFlowLayout](./PagingFlowViewDemo.gif)
 
 ## Example
 

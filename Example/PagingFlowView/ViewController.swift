@@ -9,83 +9,41 @@
 import UIKit
 import PagingFlowView
 
-class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
-    var collectionView: UICollectionView!
+    var tableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+    
+        tableView = UITableView(frame: view.bounds)
         
-        let pagingFlowLayout = PagingFlowLayout()
-        pagingFlowLayout.pageRange = 145
-        pagingFlowLayout.maximumSkippingPages = 3
-        pagingFlowLayout.initiateCompensativeAnimationOnEndDraggingPage = false
-        pagingFlowLayout.itemSize = CGSize(width: 140, height: 210)
-        pagingFlowLayout.minimumLineSpacing = 5
-        pagingFlowLayout.minimumInteritemSpacing = 5
-        pagingFlowLayout.scrollDirection = .horizontal
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "UITableViewCell")
         
-        collectionView = UICollectionView(frame: CGRect(origin: .zero, size: CGSize(width: view.bounds.width, height: 210)), collectionViewLayout: pagingFlowLayout)
-        collectionView.center = view.center
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.contentInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-//        collectionView.contentInset = UIEdgeInsets(top: 0, left: (view.bounds.width) / 2 * 3, bottom: 0, right: (view.bounds.width) / 2 * 3)
-//        collectionView.contentInset = UIEdgeInsets(top: 0, left: (view.bounds.width - pagingFlowLayout.itemSize.width) / 2, bottom: 0, right: (view.bounds.width - pagingFlowLayout.itemSize.width) / 2)
-        collectionView.register(PagingFlowCell.self, forCellWithReuseIdentifier: "PagingFlowCell")
-        collectionView.backgroundColor = UIColor(red: 250.0 / 255, green: 250.0 / 255, blue: 250.0 / 255, alpha: 1.0)
-        view.addSubview(collectionView)
-        
-        pagingFlowLayout.pagingAlignOffset = CGPoint(x: -collectionView.contentInset.left, y: 0)
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        view.addSubview(tableView)
     }
     
-    private var numberOfItems = 10
+    // MARK: UITableViewDelegate/DataSource
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return numberOfItems
+    private let detailViewControllerClassList: [UIViewController.Type] = [InstagramViewController.self]
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return detailViewControllerClassList.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PagingFlowCell", for: indexPath)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "UITableViewCell", for: indexPath)
+        
+        cell.textLabel?.text = "\(detailViewControllerClassList[indexPath.row])"
+        
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        numberOfItems -= 1
-        collectionView.deleteItems(at: [indexPath])
-    }
-}
-
-class PagingFlowCell: UICollectionViewCell {
-    
-    var followButton: UIButton!
-    var nameLabel: UILabel!
-    var referNameLabel: UILabel!
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let viewControllerClass = detailViewControllerClassList[indexPath.row]
         
-        backgroundColor = .white
-        layer.cornerRadius = 4.0
-        layer.borderColor = UIColor(red: 225.0 / 255, green: 225.0 / 255, blue: 225.0 / 255, alpha: 1.0).cgColor
-        layer.borderWidth = 1.0
-        
-        followButton = UIButton(type: .custom)
-        followButton.frame = CGRect(x: 11, y: 170, width: 116, height: 28)
-        followButton.titleLabel?.font = UIFont.systemFont(ofSize: 14)
-        followButton.setTitle("关注", for: .normal)
-        followButton.setTitleColor(.white, for: .normal)
-        followButton.layer.backgroundColor = UIColor(red: 30.0 / 255, green: 153.0 / 255, blue: 236.0 / 255, alpha: 1.0).cgColor
-        followButton.layer.cornerRadius = 2.0
-        contentView.addSubview(followButton)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        navigationController?.pushViewController(viewControllerClass.init(), animated: true)
     }
 }

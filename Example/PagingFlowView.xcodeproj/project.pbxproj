@@ -14,6 +14,7 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		74C106831F2C27FD0059F414 /* InstagramViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74C106821F2C27FD0059F414 /* InstagramViewController.swift */; };
 		C05FDB2D0A70D6CC3530983C /* Pods_PagingFlowView_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 17F7D8B103095EE5D5B779B8 /* Pods_PagingFlowView_Tests.framework */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +45,7 @@
 		607FACE51AFB9204008FA782 /* PagingFlowView_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PagingFlowView_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
+		74C106821F2C27FD0059F414 /* InstagramViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstagramViewController.swift; sourceTree = "<group>"; };
 		7F2B7142DDFA8853D52774E9 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		921168908D23F7F0F6D92606 /* Pods-PagingFlowView_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PagingFlowView_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PagingFlowView_Example/Pods-PagingFlowView_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		FD92B50E77D08405BAD58801 /* Pods-PagingFlowView_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PagingFlowView_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PagingFlowView_Tests/Pods-PagingFlowView_Tests.release.xcconfig"; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
+				74C106821F2C27FD0059F414 /* InstagramViewController.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
@@ -363,6 +366,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74C106831F2C27FD0059F414 /* InstagramViewController.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 			);

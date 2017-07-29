@@ -5,6 +5,10 @@
 [![License](https://img.shields.io/cocoapods/l/PagingFlowView.svg?style=flat)](http://cocoapods.org/pods/PagingFlowView)
 [![Platform](https://img.shields.io/cocoapods/p/PagingFlowView.svg?style=flat)](http://cocoapods.org/pods/PagingFlowView)
 
+## Demo
+
+[![Demo Out-of-Box PagingFlowLayout](./PagingFlowViewDemo.gif)]
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
